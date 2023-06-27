@@ -178,6 +178,12 @@ public class SearchRequestBuilder: RequestBuilder {
     }
 
     @discardableResult
+    public func set(trackTotalHits: Bool) -> Self {
+        _searchSource.trackTotalHits = trackTotalHits
+        return self
+    }
+
+    @discardableResult
     public func add(sort: Sort) -> Self {
         if _searchSource.sorts != nil {
             _searchSource.sorts?.append(sort)
@@ -320,7 +326,7 @@ public struct SearchRequest: Request {
         self.preference = preference
     }
 
-    public init(indices: [String]? = nil, types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil, pointInTime: PointInTime? = nil) {
+    public init(indices: [String]? = nil, types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil, pointInTime: PointInTime? = nil, trackTotalHits: Bool? = nil) {
         var searchSource = SearchSource()
         searchSource.query = query
         searchSource.postFilter = postFilter
@@ -341,11 +347,12 @@ public struct SearchRequest: Request {
         searchSource.storedFields = storedFields
         searchSource.version = version
         searchSource.pointInTime = pointInTime
+        searchSource.trackTotalHits = trackTotalHits
         self.init(indices: indices, types: types, searchSource: searchSource, scroll: scroll, searchType: searchType, preference: preference)
     }
 
-    public init(indices: String..., types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil, pointInTime: PointInTime? = nil) {
-        self.init(indices: indices, types: types, query: query, from: from, size: size, sorts: sorts, sourceFilter: sourceFilter, explain: explain, minScore: minScore, scroll: scroll, trackScores: trackScores, indicesBoost: indicesBoost, searchType: searchType, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, preference: preference, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight, rescore: rescore, searchAfter: searchAfter, pointInTime: pointInTime)
+    public init(indices: String..., types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil, pointInTime: PointInTime? = nil, trackTotalHits: Bool? = nil) {
+        self.init(indices: indices, types: types, query: query, from: from, size: size, sorts: sorts, sourceFilter: sourceFilter, explain: explain, minScore: minScore, scroll: scroll, trackScores: trackScores, indicesBoost: indicesBoost, searchType: searchType, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, preference: preference, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight, rescore: rescore, searchAfter: searchAfter, pointInTime: pointInTime, trackTotalHits: trackTotalHits)
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
@@ -893,6 +900,7 @@ public struct SearchSource {
     public var searchAfter: CodableValue?
     public var suggest: SuggestSource?
     public var pointInTime: PointInTime?
+    public var trackTotalHits: Bool?
 }
 
 extension SearchSource: Codable {
@@ -916,6 +924,7 @@ extension SearchSource: Codable {
         searchAfter = try container.decodeIfPresent(CodableValue.self, forKey: .searchAfter)
         suggest = try container.decodeIfPresent(SuggestSource.self, forKey: .suggest)
         pointInTime = try container.decodeIfPresent(PointInTime.self, forKey: .pointInTime)
+        trackTotalHits = try container.decodeIfPresent(Bool.self, forKey: .trackTotalHits)
 
         do {
             scriptFields = try container.decodeArrayIfPresent(forKey: .scriptFields)
@@ -970,6 +979,7 @@ extension SearchSource: Codable {
         try container.encodeIfPresent(searchAfter, forKey: .searchAfter)
         try container.encodeIfPresent(suggest, forKey: .suggest)
         try container.encodeIfPresent(pointInTime, forKey: .pointInTime)
+        try container.encodeIfPresent(trackTotalHits, forKey: .trackTotalHits)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -993,6 +1003,7 @@ extension SearchSource: Codable {
         case searchAfter = "search_after"
         case suggest
         case pointInTime = "pit"
+        case trackTotalHits = "track_total_hits"
     }
 }
 
@@ -1018,6 +1029,7 @@ extension SearchSource: Equatable {
             && isEqualQueries(lhs.postFilter, rhs.postFilter)
             && lhs.suggest == rhs.suggest
             && lhs.pointInTime == rhs.pointInTime
+            && lhs.trackTotalHits == rhs.trackTotalHits
     }
 }
 
