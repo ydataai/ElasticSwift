@@ -5,6 +5,8 @@ import NIOHTTP1
 // MARK: - Point In Time Request
 
 public struct PointInTimeRequest: Request, Equatable {
+  public var headers = HTTPHeaders()
+
   public let indices: [String]
   public let keepAlive: String
 
