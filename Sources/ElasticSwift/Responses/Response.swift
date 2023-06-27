@@ -189,11 +189,11 @@ extension CollectorResult: Codable {
 extension CollectorResult: Equatable {}
 
 public struct SearchHits<T: Codable>: Codable, Equatable where T: Equatable {
-    public let total: Int
+    public let total: SearchHitsTotal?
     public let maxScore: Decimal?
     public let hits: [SearchHit<T>]
 
-    public init(total: Int, maxScore: Decimal?, hits: [SearchHit<T>] = []) {
+    public init(total: SearchHitsTotal?, maxScore: Decimal?, hits: [SearchHit<T>] = []) {
         self.total = total
         self.maxScore = maxScore
         self.hits = hits
@@ -332,6 +332,11 @@ extension SearchHit: Equatable {}
 public struct SearchHitField: Codable, Equatable {
     public let name: String
     public let values: [CodableValue]
+}
+
+public struct SearchHitsTotal: Codable, Equatable {
+    public let value: Int
+    public let relation: String
 }
 
 public struct Explanation: Codable, Equatable {
