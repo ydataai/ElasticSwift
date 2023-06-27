@@ -69,6 +69,7 @@ public struct SearchResponse<T: Codable>: Codable, Equatable where T: Equatable 
     public let scrollId: String?
     public let profile: SearchProfileShardResults?
     public let suggest: [String: [SuggestEntry]]?
+    public let pitId: String?
 
     enum CodingKeys: String, CodingKey {
         case took
@@ -78,6 +79,7 @@ public struct SearchResponse<T: Codable>: Codable, Equatable where T: Equatable 
         case scrollId = "_scroll_id"
         case profile
         case suggest
+        case pitId = "pit_id"
     }
 }
 
@@ -1214,3 +1216,10 @@ public struct ClusterUpdateSettingsResponse {
 extension ClusterUpdateSettingsResponse: Codable {}
 
 extension ClusterUpdateSettingsResponse: Equatable {}
+
+// MARK: - Point In Time Response
+
+/// A response for Point in Time 
+public struct PointInTimeResponse: Codable, Equatable {
+    public let id: String
+}
