@@ -287,6 +287,10 @@ public extension ElasticClient {
     func searchTemplate<T: Codable>(_ searchTemplateRequest: SearchTemplateRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) {
         return execute(request: searchTemplateRequest, options: options, completionHandler: completionHandler)
     }
+
+    func pointIntTime(_ pointIntTimeRequest: PointInTimeRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<PointInTimeResponse, Error>) -> Void) {
+        return execute(request: pointIntTimeRequest, options: options, completionHandler: completionHandler)
+    }
 }
 
 /// Extention declaring various flavors of elasticsearch client
